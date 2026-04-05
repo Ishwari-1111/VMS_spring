@@ -10,7 +10,7 @@ public class Volunteer {
 
     private String name;
 
-    @ManyToMany(mappedBy = "volunteers")
+    @Transient
     private Set<Event> enrolledEvents = new HashSet<>();
 
     public Volunteer() {}
