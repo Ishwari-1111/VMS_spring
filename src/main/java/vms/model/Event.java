@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Entity
 @Table(name = "events")
@@ -24,18 +22,9 @@ public class Event {
     @NotNull
     private LocalDate date;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "volunteer_hours",
-        joinColumns = @JoinColumn(name = "event_id"),
-        inverseJoinColumns = @JoinColumn(name = "volunteer_id")
-    )
-    @MapKeyJoinColumn(name = "volunteer_id")
-    @ElementCollection
-    @Column(name = "hours")
-    private final Map<Volunteer, Integer> volunteers = new HashMap<>();
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EventVolunteer> eventVolunteers = new ArrayList<>();
 
-    // Required by JPA
     protected Event() {}
 
     public Event(String eventId, String eventName, LocalDate date) {
@@ -48,15 +37,12 @@ public class Event {
         this.date = date;
     }
 
-    // ── All existing methods unchanged below ──
-
     public String getEventId() { return eventId; }
     public String getEventName() { return eventName; }
 
     public void setEventName(String eventName) {
-        if (eventName == null || eventName.trim().isEmpty()) {
+        if (eventName == null || eventName.trim().isEmpty())
             throw new IllegalArgumentException("eventName cannot be empty");
-        }
         this.eventName = eventName.trim();
     }
 
@@ -67,37 +53,50 @@ public class Event {
         this.date = date;
     }
 
-    public Map<Volunteer, Integer> getVolunteerHours() {
-        return Collections.unmodifiableMap(volunteers);
-    }
-
     public boolean addVolunteer(Volunteer volunteer) {
         if (volunteer == null) return false;
-        return volunteers.putIfAbsent(volunteer, 0) == null;
+        boolean exists = eventVolunteers.stream()
+            .anyMatch(ev -> ev.getVolunteer().equals(volunteer));
+        if (exists) return false;
+        eventVolunteers.add(new EventVolunteer(this, volunteer));
+        return true;
     }
 
     public boolean removeVolunteer(Volunteer volunteer) {
         if (volunteer == null) return false;
-        return volunteers.remove(volunteer) != null;
+        return eventVolunteers.removeIf(
+            ev -> ev.getVolunteer().equals(volunteer));
     }
 
     public void logHours(Volunteer volunteer, int hours) {
-        if (volunteer == null || hours <= 0) {
+        if (volunteer == null || hours <= 0)
             throw new IllegalArgumentException("Invalid volunteer or hours");
-        }
-        Integer current = volunteers.get(volunteer);
-        if (current == null) throw new IllegalStateException("Volunteer not enrolled");
-        volunteers.put(volunteer, current + hours);
+        EventVolunteer ev = eventVolunteers.stream()
+            .filter(e -> e.getVolunteer().equals(volunteer))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("Volunteer not enrolled"));
+        ev.addHours(hours);
     }
 
-    public int getNumberOfVolunteers() { return volunteers.size(); }
+    public Map<Volunteer, Integer> getVolunteerHours() {
+        Map<Volunteer, Integer> map = new HashMap<>();
+        for (EventVolunteer ev : eventVolunteers)
+            map.put(ev.getVolunteer(), ev.getHours());
+        return Collections.unmodifiableMap(map);
+    }
+
+    public int getNumberOfVolunteers() { return eventVolunteers.size(); }
 
     public int getTotalHours() {
-        return volunteers.values().stream().mapToInt(Integer::intValue).sum();
+        return eventVolunteers.stream().mapToInt(EventVolunteer::getHours).sum();
     }
 
     public int getHoursForVolunteer(Volunteer volunteer) {
-        return volunteers.getOrDefault(volunteer, 0);
+        return eventVolunteers.stream()
+            .filter(ev -> ev.getVolunteer().equals(volunteer))
+            .mapToInt(EventVolunteer::getHours)
+            .findFirst()
+            .orElse(0);
     }
 
     @Override
@@ -107,12 +106,11 @@ public class Event {
         return eventId.equals(((Event) o).eventId);
     }
 
-    @Override
-    public int hashCode() { return eventId.hashCode(); }
+    @Override public int hashCode() { return eventId.hashCode(); }
 
     @Override
     public String toString() {
         return "Event{id='" + eventId + "', name='" + eventName +
-               "', date=" + date + ", volunteers=" + volunteers.size() + '}';
+               "', date=" + date + ", volunteers=" + eventVolunteers.size() + '}';
     }
 }
