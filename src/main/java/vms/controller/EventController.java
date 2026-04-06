@@ -1,7 +1,4 @@
-package vms.controller;
 
-public class EventController 
-{
     package vms.controller;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -67,5 +64,4 @@ Map.Entry::getValue
 public record CreateEventRequest(String eventId, String eventName, LocalDate dat
 public record LogHoursRequest(int hours) {}
 }
-    
-}
+
