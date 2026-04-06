@@ -1,7 +1,4 @@
-package vms.exception;
 
-public class GlobalExceptionHandler 
-{
     package vms.exception;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,6 +19,4 @@ return ResponseEntity.status(409).body(Map.of("error", e.getMessage()));
 public ResponseEntity<Map<String, String>> handleNotFound(NoSuchElementException
 return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
 }
-}
-    
 }
