@@ -1,8 +1,4 @@
 package vms.controller;
-
-public class EventController 
-{
-    package vms.controller;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +7,9 @@ import vms.service.EventService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+
+
+    
 @RestController
 @RequestMapping("/api/events")
 @CrossOrigin(origins = "*")
@@ -64,8 +63,8 @@ e -> e.getKey().getName(),
 Map.Entry::getValue
 ));
 }
-public record CreateEventRequest(String eventId, String eventName, LocalDate dat
+public record CreateEventRequest(String eventId, String eventName, LocalDate date) {}
 public record LogHoursRequest(int hours) {}
 }
     
-}
+
