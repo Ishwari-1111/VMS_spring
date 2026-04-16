@@ -1,5 +1,62 @@
 package vms.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import vms.model.Volunteer;
+import vms.service.VolunteerService;
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/volunteers")
+@CrossOrigin(origins = "*")
 public class VolunteerController {
     
+    private final VolunteerService volunteerService;
+    
+    public VolunteerController(VolunteerService volunteerService) {
+        this.volunteerService = volunteerService;
+    }
+    
+    // Get all volunteers
+    @GetMapping
+    public List<Volunteer> getAll() {
+        return volunteerService.getAllVolunteers();
+    }
+    
+    // Get volunteer by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Volunteer> getOne(@PathVariable String id) {
+        Optional<Volunteer> volunteer = volunteerService.getVolunteer(id);
+        return volunteer.isPresent() ? ResponseEntity.ok(volunteer.get()) 
+                                     : ResponseEntity.notFound().build();
+    }
+    
+    // Add a new volunteer
+    @PostMapping
+    public ResponseEntity<Volunteer> addVolunteer(@RequestParam String id, 
+                                                   @RequestParam String name) {
+        try {
+            Volunteer volunteer = volunteerService.addVolunteer(id, name);
+            return ResponseEntity.status(HttpStatus.CREATED).body(volunteer);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    // Remove volunteer
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> removeVolunteer(@PathVariable String id) {
+        if (volunteerService.removeVolunteer(id)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+    
+    // Get volunteer count
+    @GetMapping("/count")
+    public ResponseEntity<Long> getVolunteerCount() {
+        return ResponseEntity.ok(volunteerService.getVolunteerCount());
+    }
 }

@@ -1,9 +1,6 @@
-<<<<<<< HEAD
-package vms.controller;
-=======
 
-    package vms.controller;
->>>>>>> 7f6aec662ce8fde9d9aba480673f9e725ce081a5
+package vms.controller;
+
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,8 +68,4 @@ Map.Entry::getValue
 public record CreateEventRequest(String eventId, String eventName, LocalDate date) {}
 public record LogHoursRequest(int hours) {}
 }
-<<<<<<< HEAD
-    
-=======
->>>>>>> 7f6aec662ce8fde9d9aba480673f9e725ce081a5
 
