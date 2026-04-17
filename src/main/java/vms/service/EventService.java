@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -44,13 +45,13 @@ public class EventService {
 
     public Event getEvent(String eventId) {
         return eventRepo.findById(eventId)
-            .orElseThrow(() -> new NoSuchElementException("Event not found: " + eventId));
+                .orElseThrow(() -> new NoSuchElementException("Event not found: " + eventId));
     }
 
     public boolean enrollVolunteer(String eventId, String volunteerId) {
         Event event = getEvent(eventId);
         Volunteer volunteer = volunteerRepo.findById(volunteerId)
-            .orElseThrow(() -> new NoSuchElementException("Volunteer not found: " + volunteerId));
+                .orElseThrow(() -> new NoSuchElementException("Volunteer not found: " + volunteerId));
         boolean added = event.addVolunteer(volunteer);
         eventRepo.save(event);
         return added;
@@ -59,7 +60,7 @@ public class EventService {
     public boolean unenrollVolunteer(String eventId, String volunteerId) {
         Event event = getEvent(eventId);
         Volunteer volunteer = volunteerRepo.findById(volunteerId)
-            .orElseThrow(() -> new NoSuchElementException("Volunteer not found: " + volunteerId));
+                .orElseThrow(() -> new NoSuchElementException("Volunteer not found: " + volunteerId));
         boolean removed = event.removeVolunteer(volunteer);
         eventRepo.save(event);
         return removed;
@@ -68,7 +69,7 @@ public class EventService {
     public void logHours(String eventId, String volunteerId, int hours) {
         Event event = getEvent(eventId);
         Volunteer volunteer = volunteerRepo.findById(volunteerId)
-            .orElseThrow(() -> new NoSuchElementException("Volunteer not found: " + volunteerId));
+                .orElseThrow(() -> new NoSuchElementException("Volunteer not found: " + volunteerId));
         event.logHours(volunteer, hours);
         eventRepo.save(event);
     }
