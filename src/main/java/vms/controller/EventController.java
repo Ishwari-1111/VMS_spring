@@ -81,9 +81,9 @@ public class EventController {
     }
 
     public record CreateEventRequest(
-            String eventId,
-            String eventName,
-            LocalDate date) {
+            @jakarta.validation.constraints.NotBlank(message = "Event ID cannot be blank") String eventId,
+            @jakarta.validation.constraints.NotBlank(message = "Event Name cannot be blank") String eventName,
+            @jakarta.validation.constraints.NotNull(message = "Date cannot be null") LocalDate date) {
     }
 
     public record LogHoursRequest(int hours) {

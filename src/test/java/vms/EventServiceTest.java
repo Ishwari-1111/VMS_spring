@@ -2,6 +2,8 @@ package vms;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -105,4 +107,23 @@ class EventServiceTest {
         verify(eventRepository, never()).deleteById(any());
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "E100, V1, Alice", // Event 100, Volunteer 1
+            "E101, V2, Bob",   // Event 101, Volunteer 2
+            "E102, V3, Charlie"// Event 102, Volunteer 3
+    })
+    void testEnrollVolunteer_ParameterizedSuccess(String eventId, String volunteerId, String volunteerName) {
+        // Here we test positive service execution over multiple input data combinations
+        Event mockEvent = new Event(eventId, "Sample Event", LocalDate.of(2026, 4, 17));
+        Volunteer mockVol = new Volunteer(volunteerId, volunteerName);
+
+        when(eventRepository.findById(eventId)).thenReturn(Optional.of(mockEvent));
+        when(volunteerRepository.findById(volunteerId)).thenReturn(Optional.of(mockVol));
+
+        boolean result = eventService.enrollVolunteer(eventId, volunteerId);
+
+        assertTrue(result);
+        verify(eventRepository).save(mockEvent); // Ensure save is called
+    }
 }
