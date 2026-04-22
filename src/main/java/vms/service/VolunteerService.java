@@ -45,6 +45,13 @@ public class VolunteerService {
         return true;
     }
 
+    public void deleteVolunteer(String id) {
+        if (!volunteerRepository.existsById(id)) {
+            throw new IllegalArgumentException("Volunteer with id " + id + " not found");
+        }
+        volunteerRepository.deleteById(id);
+    }
+
     public long getVolunteerCount() {
         return volunteerRepository.count();
     }

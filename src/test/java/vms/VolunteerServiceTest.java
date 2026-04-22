@@ -88,15 +88,14 @@ class VolunteerServiceTest {
     @Test
     void testDeleteVolunteer_success() {
         when(VolunteerRepository.existsById("A100")).thenReturn(true);
-        volunteerService.removeVolunteer("A100");
+        volunteerService.deleteVolunteer("A100");
         verify(VolunteerRepository, times(1)).deleteById("A100");
     }
 
     @Test
     void testDeleteVolunteer_notFound() {
         when(VolunteerRepository.existsById("A200")).thenReturn(false);
-        boolean result = volunteerService.removeVolunteer("A200");
-        assertFalse(result);
+        assertThrows(IllegalArgumentException.class, () -> volunteerService.deleteVolunteer("A200"));
         verify(VolunteerRepository, never()).deleteById(anyString());
     }
 
