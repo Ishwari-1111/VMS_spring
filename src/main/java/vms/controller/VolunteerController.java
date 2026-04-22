@@ -33,15 +33,22 @@ public class VolunteerController {
                                      : ResponseEntity.notFound().build();
     }
     
-    // Add a new volunteer
-    @PostMapping
-    public ResponseEntity<Volunteer> addVolunteer(@RequestParam String id, 
-                                                   @RequestParam String name) {
+    // Sign up endpoint (with JSON body)
+    @PostMapping(value = "/signup", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> signup(@RequestBody Volunteer volunteer) {
         try {
-            Volunteer volunteer = volunteerService.addVolunteer(id, name);
-            return ResponseEntity.status(HttpStatus.CREATED).body(volunteer);
+            Volunteer createdVolunteer = volunteerService.addVolunteer(
+                volunteer.getVolunteerId(), 
+                volunteer.getName(),
+                volunteer.getEmail()
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdVolunteer);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(
+                new java.util.HashMap<String, String>() {{
+                    put("error", e.getMessage());
+                }}
+            );
         }
     }
     

@@ -22,6 +22,12 @@ public class Event {
     @NotNull
     private LocalDate date;
 
+    @Column(name = "finish_date")
+    private LocalDate finishDate;
+
+    @Column(name = "is_completed", nullable = false)
+    private Boolean isCompleted = false;
+
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventVolunteer> eventVolunteers = new ArrayList<>();
 
@@ -51,6 +57,25 @@ public class Event {
     public void setDate(LocalDate date) {
         if (date == null) throw new IllegalArgumentException("date cannot be null");
         this.date = date;
+    }
+
+    public LocalDate getFinishDate() { return finishDate; }
+
+    public void setFinishDate(LocalDate finishDate) {
+        this.finishDate = finishDate;
+    }
+
+    public Boolean isCompleted() { return isCompleted; }
+
+    public void markAsCompleted(LocalDate finishDate) {
+        if (finishDate == null) throw new IllegalArgumentException("finishDate cannot be null");
+        this.finishDate = finishDate;
+        this.isCompleted = true;
+    }
+
+    public void markAsIncomplete() {
+        this.isCompleted = false;
+        this.finishDate = null;
     }
 
     public boolean addVolunteer(Volunteer volunteer) {
@@ -111,6 +136,7 @@ public class Event {
     @Override
     public String toString() {
         return "Event{id='" + eventId + "', name='" + eventName +
-               "', date=" + date + ", volunteers=" + eventVolunteers.size() + '}';
+               "', date=" + date + ", finishDate=" + finishDate + 
+               ", isCompleted=" + isCompleted + ", volunteers=" + eventVolunteers.size() + '}';
     }
 }

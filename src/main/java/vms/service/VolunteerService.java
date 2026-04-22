@@ -20,6 +20,16 @@ public class VolunteerService {
         }
         return volunteerRepository.save(new Volunteer(id, name));
     }
+    
+    public Volunteer addVolunteer(String id, String name, String email) {
+        if (volunteerRepository.existsById(id)) {
+            throw new IllegalArgumentException(
+                "Volunteer with id " + id + " already exists");
+        }
+        Volunteer volunteer = new Volunteer(id, name);
+        volunteer.setEmail(email);
+        return volunteerRepository.save(volunteer);
+    }
 
     public Optional<Volunteer> getVolunteer(String id) {
         return volunteerRepository.findById(id);
