@@ -16,9 +16,19 @@ public class VolunteerService {
     public Volunteer addVolunteer(String id, String name) {
         if (volunteerRepository.existsById(id)) {
             throw new IllegalArgumentException(
-                    "Volunteer with id " + id + " already exists");
+                "Volunteer with id " + id + " already exists");
         }
         return volunteerRepository.save(new Volunteer(id, name));
+    }
+    
+    public Volunteer addVolunteer(String id, String name, String email) {
+        if (volunteerRepository.existsById(id)) {
+            throw new IllegalArgumentException(
+                "Volunteer with id " + id + " already exists");
+        }
+        Volunteer volunteer = new Volunteer(id, name);
+        volunteer.setEmail(email);
+        return volunteerRepository.save(volunteer);
     }
 
     public Optional<Volunteer> getVolunteer(String id) {
@@ -30,21 +40,12 @@ public class VolunteerService {
     }
 
     public boolean removeVolunteer(String id) {
-        if (!volunteerRepository.existsById(id))
-            return false;
+        if (!volunteerRepository.existsById(id)) return false;
         volunteerRepository.deleteById(id);
         return true;
     }
 
     public long getVolunteerCount() {
         return volunteerRepository.count();
-    }
-
-    public void deleteVolunteer(String id) {
-        if (!volunteerRepository.existsById(id)) {
-            throw new IllegalArgumentException(
-                    "Volunteer with id " + id + " does not exist");
-        }
-        volunteerRepository.deleteById(id);
     }
 }
