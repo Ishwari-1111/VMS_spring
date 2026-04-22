@@ -1,6 +1,7 @@
 package vms.model;
 import jakarta.persistence.*;
-import java.util.*;
+import jakarta.validation.constraints.Email;
+//import java.util.*;
 
 @Entity
 @Table(name = "volunteers")
@@ -8,10 +9,15 @@ public class Volunteer {
     @Id
     private String volunteerId;
 
+    @Column(nullable = false)
     private String name;
+    
+    @Column(unique = true)
+    @Email(message = "Email should be valid")
+    private String email;
 
-    @Transient
-    private Set<Event> enrolledEvents = new HashSet<>();
+    // Note: EventVolunteer table manages the many-to-many relationship with Event
+    // No need for @Transient enrolledEvents - use repository queries instead
 
     public Volunteer() {}
 
@@ -25,34 +31,39 @@ public class Volunteer {
     }
     public String getVolunteerId() { return volunteerId; }
     public String getName() { return name; }
+    public String getEmail() { return email; }
+    
+    public void setVolunteerId(String volunteerId) {
+        this.volunteerId = volunteerId;
+    }
 
     public void setName(String name) {
         if (name == null || name.trim().isEmpty())
             throw new IllegalArgumentException("name cannot be empty");
         this.name = name.trim();
     }
+    
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
+    // Note: Event enrollment is managed via EventVolunteer entity and VolunteerRepository.findVolunteersByEventId()
+    // These methods below are kept for API compatibility but enrollment is actually managed in EventService
+    
     public boolean volunteerForEvent(Event event) {
         if (event == null) return false;
-        boolean added = event.addVolunteer(this);
-        if (added) enrolledEvents.add(event);
-        return added;
+        return event.addVolunteer(this);
     }
 
     public boolean unvolunteerFromEvent(Event event) {
         if (event == null) return false;
-        boolean removed = event.removeVolunteer(this);
-        if (removed) enrolledEvents.remove(event);
-        return removed;
+        return event.removeVolunteer(this);
     }
 
     public void logHours(Event event, int hours) {
-        if (!enrolledEvents.contains(event))
-            throw new IllegalStateException("Volunteer not enrolled in event");
+        if (event == null)
+            throw new IllegalStateException("Event cannot be null");
         event.logHours(this, hours);
-    }
-    public Set<Event> getEnrolledEvents() {
-        return Collections.unmodifiableSet(enrolledEvents);
     }
 
     @Override
@@ -66,8 +77,7 @@ public class Volunteer {
 
     @Override
     public String toString() {
-        return "Volunteer{id='" + volunteerId + "', name='" + name
-             + "', events=" + enrolledEvents.size() + '}';
+        return "Volunteer{id='" + volunteerId + "', name='" + name + "', email='" + email + "'}";
     }
     
 }
