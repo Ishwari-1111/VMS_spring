@@ -13,7 +13,7 @@ pipeline {
             steps {
                 echo 'Building the Spring Boot application...'
                 // Compiles the Java source code
-                sh 'mvn clean compile'
+                sh './mvnw clean compile'
             }
         }
 
@@ -21,7 +21,7 @@ pipeline {
             steps {
                 echo 'Running Unit and Integration tests...'
                 // Runs the tests to ensure the application works perfectly
-                sh 'mvn test'
+                sh './mvnw test'
             }
         }
 
@@ -29,7 +29,7 @@ pipeline {
             steps {
                 echo 'Packaging the application into a standalone JAR file...'
                 // Packages the compiled code into a runnable .jar file
-                sh 'mvn package -DskipTests'
+                sh './mvnw package -DskipTests'
             }
         }
     }
