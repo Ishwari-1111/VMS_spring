@@ -65,21 +65,23 @@ class VolunteerControllerTest {
     @Test
     void testAddVolunteer_Success() throws Exception {
         Volunteer volunteer = new Volunteer("V3", "Bob");
-        when(volunteerService.addVolunteer("V3", "Bob")).thenReturn(volunteer);
-        mockMvc.perform(post("/api/volunteers")
-                        .param("id", "V3")
-                        .param("name", "Bob"))
+        when(volunteerService.addVolunteer("V3", "Bob", null)).thenReturn(volunteer);
+        mockMvc.perform(post("/api/volunteers/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(volunteer)))
                 .andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(volunteer)));
     }
 
     @Test
     void testAddVolunteer_BadRequest() throws Exception {
-        when(volunteerService.addVolunteer(anyString(), anyString()))
+        when(volunteerService.addVolunteer(anyString(), anyString(), nullable(String.class)))
                 .thenThrow(new IllegalArgumentException("Volunteer exists"));
-        mockMvc.perform(post("/api/volunteers")
-                        .param("id", "V4")
-                        .param("name", "Carol"))
+        
+        Volunteer v = new Volunteer("V4", "Carol");
+        mockMvc.perform(post("/api/volunteers/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(v)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -112,13 +114,16 @@ class VolunteerControllerTest {
             "'', ''"     // both blank
     })
     void testAddVolunteer_ValidationFailures(String id, String name) throws Exception {
-        // Here we simulate bad parameter inputs which the controller should reject or handle as error!
-        when(volunteerService.addVolunteer(anyString(), anyString()))
+        when(volunteerService.addVolunteer(anyString(), anyString(), nullable(String.class)))
                 .thenThrow(new IllegalArgumentException("Invalid input"));
 
-        mockMvc.perform(post("/api/volunteers")
-                        .param("id", id)
-                        .param("name", name))
-                .andExpect(status().isBadRequest()); // Expect exception mapped to 400
+        Map<String, String> volunteerMap = new HashMap<>();
+        volunteerMap.put("volunteerId", id);
+        volunteerMap.put("name", name);
+
+        mockMvc.perform(post("/api/volunteers/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(volunteerMap)))
+                .andExpect(status().isBadRequest());
     }
 }
