@@ -34,7 +34,7 @@ public class EventController {
 
     @PostMapping(consumes = "application/json", produces = "application/json")
     public Event create(@RequestBody @Valid CreateEventRequest req) {
-        return eventService.createEvent(req.eventId(), req.eventName(), req.date());
+        return eventService.createEvent(req.eventId(), req.eventName(), req.date(), req.finishDate());
     }
 
     @DeleteMapping("/{id}")
@@ -116,7 +116,7 @@ public class EventController {
         }
     }
 
-    public record CreateEventRequest(@NotBlank String eventId, @NotBlank String eventName, @NotNull LocalDate date) {}
+    public record CreateEventRequest(@NotBlank String eventId, @NotBlank String eventName, @NotNull LocalDate date, @NotNull LocalDate finishDate) {}
     public record LogHoursRequest(int hours) {}
     public record CompleteEventRequest(LocalDate finishDate) {}
 }
