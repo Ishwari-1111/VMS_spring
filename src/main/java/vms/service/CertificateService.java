@@ -24,6 +24,13 @@ public class CertificateService {
     private EventRepository eventRepository;
     
     /**
+     * Get all certificates
+     */
+    public List<Certificate> getAllCertificates() {
+        return certificateRepository.findAll();
+    }
+
+    /**
      * Generate certificates for all volunteers who participated in an event
      * This is the AUTOMATED process that happens when an event is completed
      */
