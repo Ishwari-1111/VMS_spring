@@ -1,6 +1,7 @@
 package vms.dto;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
  * StandardizedDTO for Certificate API responses
@@ -13,6 +14,7 @@ public record CertificateResponse(
     String volunteerName,
     String eventId,
     String eventName,
+    LocalDate completionDate,
     LocalDateTime issuedDate,
     String status
 ) {
@@ -28,6 +30,7 @@ public record CertificateResponse(
             cert.getVolunteer().getName(),
             cert.getEvent().getEventId(),
             cert.getEvent().getEventName(),
+            cert.getEvent().getFinishDate() != null ? cert.getEvent().getFinishDate() : cert.getEvent().getDate(),
             cert.getIssuedDate(),
             cert.getStatus()
         );
