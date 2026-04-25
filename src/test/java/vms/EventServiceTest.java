@@ -61,10 +61,11 @@ class EventServiceTest {
     @Test
     void testCreateEvent_success() {
         Event newEvent = new Event("E100", "Event 1", LocalDate.of(2026, 4, 17));
+        LocalDate finishDate = LocalDate.of(2026, 4, 18);
 
         when(eventRepository.existsById("E100")).thenReturn(false);
         when(eventRepository.save(newEvent)).thenReturn(newEvent);
-        Event result = eventService.createEvent("E100", "Event 1", LocalDate.of(2026, 4, 17));
+        Event result = eventService.createEvent("E100", "Event 1", LocalDate.of(2026, 4, 17), finishDate);
 
         assertNotNull(result);
         assertEquals("E100", result.getEventId());
@@ -76,11 +77,12 @@ class EventServiceTest {
     @Test
     void testCreateEvent_alreadyExists() {
         Event existingEvent = new Event("E100", "Event 1", LocalDate.of(2026, 4, 17));
+        LocalDate finishDate = LocalDate.of(2026, 4, 18);
 
         when(eventRepository.existsById("E100")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class,
-                () -> eventService.createEvent("E100", "Event 1", LocalDate.of(2026, 4, 17)));
+            () -> eventService.createEvent("E100", "Event 1", LocalDate.of(2026, 4, 17), finishDate));
 
         verify(eventRepository).existsById("E100");
         verify(eventRepository, never()).save(any());
