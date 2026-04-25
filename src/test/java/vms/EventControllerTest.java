@@ -64,9 +64,9 @@ class EventControllerTest {
 
     @Test
     void testCreateEvent() throws Exception {
-        EventController.CreateEventRequest request = new EventController.CreateEventRequest("E2", "New Event", LocalDate.of(2026, 5, 1));
+                EventController.CreateEventRequest request = new EventController.CreateEventRequest("E2", "New Event", LocalDate.of(2026, 5, 1), LocalDate.of(2026, 5, 2));
         Event created = new Event("E2", "New Event", LocalDate.of(2026, 5, 1));
-        when(eventService.createEvent(request.eventId(), request.eventName(), request.date()))
+                when(eventService.createEvent(request.eventId(), request.eventName(), request.date(), request.finishDate()))
                 .thenReturn(created);
         mockMvc.perform(post("/api/events")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -124,7 +124,7 @@ class EventControllerTest {
     })
     void testCreateEvent_ValidationFailures(String eventId, String eventName) throws Exception {
         // Date is set as valid, but ID or Name will be blank to trigger 400 Bad Request
-        EventController.CreateEventRequest request = new EventController.CreateEventRequest(eventId, eventName, LocalDate.of(2026, 5, 1));
+                EventController.CreateEventRequest request = new EventController.CreateEventRequest(eventId, eventName, LocalDate.of(2026, 5, 1), LocalDate.of(2026, 5, 2));
         mockMvc.perform(post("/api/events")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
