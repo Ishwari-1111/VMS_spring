@@ -125,8 +125,7 @@ class EventControllerTest {
     void testCreateEvent_ValidationFailures(String eventId, String eventName) throws Exception {
         // Date is set as valid, but ID or Name will be blank to trigger 400 Bad Request
         EventController.CreateEventRequest request = new EventController.CreateEventRequest(eventId, eventName, LocalDate.of(2026, 5, 1));
-        mockMvc.perform(post("/api/events")
-                        .contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/events").contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
