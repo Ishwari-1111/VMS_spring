@@ -32,6 +32,22 @@ public class VolunteerController {
         return volunteer.isPresent() ? ResponseEntity.ok(volunteer.get()) 
                                      : ResponseEntity.notFound().build();
     }
+
+    // Add volunteer using request params (kept for compatibility with existing tests/clients)
+    @PostMapping
+    public ResponseEntity<?> addVolunteer(@RequestParam("id") String id,
+                                          @RequestParam("name") String name) {
+        try {
+            Volunteer createdVolunteer = volunteerService.addVolunteer(id, name);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdVolunteer);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                new java.util.HashMap<String, String>() {{
+                    put("error", e.getMessage());
+                }}
+            );
+        }
+    }
     
     // Sign up endpoint (with JSON body)
     @PostMapping(value = "/signup", consumes = "application/json", produces = "application/json")

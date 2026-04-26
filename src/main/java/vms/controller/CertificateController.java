@@ -18,6 +18,31 @@ public class CertificateController {
     
     @Autowired
     private CertificateService certificateService;
+
+    /**
+     * Get all certificates
+     * GET /api/certificates
+     */
+    @GetMapping
+    public ResponseEntity<?> getAllCertificates() {
+        try {
+            List<Certificate> certificates = certificateService.getAllCertificates();
+            List<CertificateResponse> responses = certificates.stream()
+                .map(CertificateResponse::fromCertificate)
+                .collect(Collectors.toList());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("certificateCount", responses.size());
+            response.put("certificates", responses);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(
+                Map.of("success", false, "error", "Internal server error: " + e.getMessage())
+            );
+        }
+    }
     
     /**
      * AUTOMATED: Generate certificates for all volunteers in an event

@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+node_modules
+
+# Local-only frontend assets (do not push)
+frontend/
+public/
+src/frontend/

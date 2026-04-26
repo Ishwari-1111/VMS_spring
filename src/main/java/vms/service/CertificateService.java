@@ -22,6 +22,13 @@ public class CertificateService {
     
     @Autowired
     private EventRepository eventRepository;
+
+    /**
+     * Get all certificates (admin view)
+     */
+    public List<Certificate> getAllCertificates() {
+        return certificateRepository.findAll();
+    }
     
     /**
      * Generate certificates for all volunteers who participated in an event
