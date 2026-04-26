@@ -19,6 +19,7 @@ import vms.repository.UserRepository;
 import java.time.LocalDate;
 import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
+import org.mockito.ArgumentCaptor;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class) // enables Mockito
@@ -60,31 +61,31 @@ class EventServiceTest {
 
     @Test
     void testCreateEvent_success() {
-        Event newEvent = new Event("E100", "Event 1", LocalDate.of(2026, 4, 17));
-        LocalDate finishDate = LocalDate.of(2026, 4, 18);
+        Event expectedEvent = new Event("EV001", "Event 1", LocalDate.of(2026, 4, 17));
+        expectedEvent.setFinishDate(LocalDate.of(2026, 4, 20));
 
-        when(eventRepository.existsById("E100")).thenReturn(false);
-        when(eventRepository.save(newEvent)).thenReturn(newEvent);
-        Event result = eventService.createEvent("E100", "Event 1", LocalDate.of(2026, 4, 17), finishDate);
+        when(eventRepository.findAll()).thenReturn(Collections.emptyList());
+        when(eventRepository.existsById("EV001")).thenReturn(false);
+        when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        Event result = eventService.createEvent("Event 1", LocalDate.of(2026, 4, 17), LocalDate.of(2026, 4, 20));
 
         assertNotNull(result);
-        assertEquals("E100", result.getEventId());
+        assertEquals(expectedEvent.getEventId(), result.getEventId());
+        assertEquals(expectedEvent.getFinishDate(), result.getFinishDate());
 
-        verify(eventRepository).existsById("E100");
-        verify(eventRepository).save(newEvent);
+        verify(eventRepository).existsById("EV001");
+        verify(eventRepository).save(any(Event.class));
     }
 
     @Test
     void testCreateEvent_alreadyExists() {
-        Event existingEvent = new Event("E100", "Event 1", LocalDate.of(2026, 4, 17));
-        LocalDate finishDate = LocalDate.of(2026, 4, 18);
-
-        when(eventRepository.existsById("E100")).thenReturn(true);
+        when(eventRepository.findAll()).thenReturn(Collections.emptyList());
+        when(eventRepository.existsById("EV001")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class,
-            () -> eventService.createEvent("E100", "Event 1", LocalDate.of(2026, 4, 17), finishDate));
+                () -> eventService.createEvent("Event 1", LocalDate.of(2026, 4, 17), LocalDate.of(2026, 4, 20)));
 
-        verify(eventRepository).existsById("E100");
+        verify(eventRepository).existsById("EV001");
         verify(eventRepository, never()).save(any());
     }
 

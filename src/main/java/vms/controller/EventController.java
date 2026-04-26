@@ -32,7 +32,7 @@ return eventService.getEvent(id);
 }
 @PostMapping(consumes = "application/json", produces = "application/json")
 public Event create(@RequestBody @Valid CreateEventRequest req) {
-return eventService.createEvent(req.eventId(), req.eventName(), req.date());
+return eventService.createEvent(req.eventName(), req.date(), req.finishDate());
 }
 @DeleteMapping("/{id}")
 public ResponseEntity<Void> delete(@PathVariable String id) {
@@ -108,7 +108,7 @@ public ResponseEntity<?> markIncomplete(@PathVariable String eventId) {
         );
     }
 }
-public record CreateEventRequest(@NotBlank String eventId, @NotBlank String eventName, @NotNull LocalDate date) {}
+public record CreateEventRequest(@NotBlank String eventName, @NotNull LocalDate date, @NotNull LocalDate finishDate) {}
 public record LogHoursRequest(int hours) {}
 public record CompleteEventRequest(LocalDate finishDate) {}
 }

@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply text-neutral-900 bg-slate-100;
+    background-image:
+      radial-gradient(
+        circle at 12% 12%,
+        rgba(14, 165, 233, 0.14),
+        transparent 42%
+      ),
+      radial-gradient(
+        circle at 88% 18%,
+        rgba(16, 185, 129, 0.12),
+        transparent 36%
+      ),
+      linear-gradient(180deg, #f5f8fc 0%, #eef3f8 100%);
+    font-family:
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all duration-150 font-medium shadow-sm hover:shadow-md;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-neutral-200 text-neutral-900 rounded-lg hover:bg-neutral-300 transition-colors duration-150 font-medium shadow-sm;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-150 font-medium shadow-sm;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-150;
+  }
+
+  .card {
+    @apply bg-white/90 backdrop-blur-sm rounded-xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow duration-150;
+  }
+
+  .badge {
+    @apply inline-block px-2 py-1 text-xs font-semibold rounded-md;
+  }
+
+  .badge-primary {
+    @apply badge bg-primary-100 text-primary-700;
+  }
+
+  .badge-success {
+    @apply badge bg-green-100 text-green-700;
+  }
+
+  .badge-warning {
+    @apply badge bg-yellow-100 text-yellow-700;
+  }
+}

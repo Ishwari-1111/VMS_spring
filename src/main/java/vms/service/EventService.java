@@ -2,7 +2,6 @@ package vms.service;
 
 import jakarta.transaction.Transactional;
 //import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import vms.model.Event;
 import vms.model.Volunteer;
@@ -35,10 +34,8 @@ public class EventService {
         this.certificateRepository = certificateRepository;
     }
 
-    public Event createEvent(String eventId, String eventName, LocalDate date, LocalDate finishDate) {
-        String resolvedEventId = (eventId == null || eventId.trim().isEmpty())
-            ? generateNextEventId()
-            : eventId.trim();
+    public Event createEvent(String eventName, LocalDate date, LocalDate finishDate) {
+        String resolvedEventId = generateNextEventId();
 
         if (eventRepo.existsById(resolvedEventId)) {
             throw new IllegalArgumentException("Event already exists: " + resolvedEventId);
@@ -50,27 +47,32 @@ public class EventService {
     }
 
     private String generateNextEventId() {
-        List<Event> events = eventRepo.findAll();
-        Pattern pattern = Pattern.compile("^([A-Za-z]+)?(\\d+)$");
+        Pattern pattern = Pattern.compile("^([A-Za-z]*)(\\d+)$");
         String prefix = "EV";
-        int maxSequence = 0;
+        int maxValue = 0;
 
-        for (Event event : events) {
-            Matcher matcher = pattern.matcher(event.getEventId());
+        for (Event event : eventRepo.findAll()) {
+            String id = event.getEventId();
+            if (id == null) {
+                continue;
+            }
+
+            Matcher matcher = pattern.matcher(id.trim());
             if (!matcher.matches()) {
                 continue;
             }
 
-            String currentPrefix = matcher.group(1) != null ? matcher.group(1) : "";
-            int sequence = Integer.parseInt(matcher.group(2));
-
-            if (sequence > maxSequence) {
-                maxSequence = sequence;
-                prefix = currentPrefix.isEmpty() ? prefix : currentPrefix;
+            String currentPrefix = matcher.group(1);
+            int currentValue = Integer.parseInt(matcher.group(2));
+            if (currentValue > maxValue) {
+                maxValue = currentValue;
+                if (!currentPrefix.isEmpty()) {
+                    prefix = currentPrefix;
+                }
             }
         }
 
-        return prefix + String.format("%03d", maxSequence + 1);
+        return String.format("%s%03d", prefix, maxValue + 1);
     }
 
     public void deleteEvent(String eventId) {
@@ -81,36 +83,12 @@ public class EventService {
     }
 
     public List<Event> getAllEvents() {
-        publishCertificatesForPastEvents();
         return eventRepo.findAll();
     }
 
     public Event getEvent(String eventId) {
         return eventRepo.findById(eventId)
             .orElseThrow(() -> new NoSuchElementException("Event not found: " + eventId));
-    }
-
-    /**
-     * Automatically complete past-due events and generate certificates.
-     * This runs when events are fetched and also on a fixed schedule.
-     */
-    public void publishCertificatesForPastEvents() {
-        LocalDate today = LocalDate.now();
-        List<Event> pastDueEvents = eventRepo.findByIsCompletedFalseAndDateBefore(today);
-
-        for (Event event : pastDueEvents) {
-            event.markAsCompleted(event.getDate());
-            eventRepo.save(event);
-
-            if (certificateService != null) {
-                certificateService.generateCertificatesForEvent(event.getEventId());
-            }
-        }
-    }
-
-    @Scheduled(cron = "0 0 * * * *")
-    public void runScheduledCertificatePublication() {
-        publishCertificatesForPastEvents();
     }
 
     public boolean enrollVolunteer(String eventId, String volunteerId) {
