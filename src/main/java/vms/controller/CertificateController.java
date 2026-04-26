@@ -3,7 +3,6 @@ package vms.controller;
 import vms.model.Certificate;
 import vms.dto.CertificateResponse;
 import vms.service.CertificateService;
-import vms.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +19,6 @@ public class CertificateController {
     @Autowired
     private CertificateService certificateService;
 
-    @Autowired
-    private EventService eventService;
-
     /**
      * Get all certificates
      * GET /api/certificates
@@ -30,7 +26,6 @@ public class CertificateController {
     @GetMapping
     public ResponseEntity<?> getAllCertificates() {
         try {
-            eventService.publishCertificatesForPastEvents();
             List<Certificate> certificates = certificateService.getAllCertificates();
             List<CertificateResponse> responses = certificates.stream()
                 .map(CertificateResponse::fromCertificate)
@@ -116,7 +111,6 @@ public class CertificateController {
     @GetMapping("/volunteer/{volunteerId}")
     public ResponseEntity<?> getCertificatesByVolunteer(@PathVariable String volunteerId) {
         try {
-            eventService.publishCertificatesForPastEvents();
             List<Certificate> certificates = certificateService.getCertificatesByVolunteer(volunteerId);
             List<CertificateResponse> responses = certificates.stream()
                 .map(CertificateResponse::fromCertificate)
@@ -143,7 +137,6 @@ public class CertificateController {
     @GetMapping("/event/{eventId}")
     public ResponseEntity<?> getCertificatesByEvent(@PathVariable String eventId) {
         try {
-            eventService.publishCertificatesForPastEvents();
             List<Certificate> certificates = certificateService.getCertificatesByEvent(eventId);
             List<CertificateResponse> responses = certificates.stream()
                 .map(CertificateResponse::fromCertificate)
