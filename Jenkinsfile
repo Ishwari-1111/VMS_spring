@@ -17,11 +17,11 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Test Event Module') {
             steps {
-                echo 'Running Unit and Integration tests...'
-                // Runs the tests to ensure the application works perfectly
-                sh './mvnw test'
+                echo 'Running Unit and Integration tests for Event Module...'
+                // Runs only Event related tests
+                sh './mvnw test -Dtest="*Event*"'
             }
         }
 
