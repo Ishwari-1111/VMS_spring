@@ -13,7 +13,7 @@ pipeline {
             steps {
                 echo 'Building the Spring Boot application...'
                 // Compiles the Java source code to ensure dependencies aren't broken
-                sh './mvnw clean compile'
+                bat 'mvnw.cmd clean compile'
             }
         }
 
@@ -21,7 +21,7 @@ pipeline {
             steps {
                 echo 'Running Unit and Integration tests for Volunteer module...'
                 // Runs ONLY the tests related to the Volunteer module
-                sh './mvnw test -Dtest="*Volunteer*Test"'
+                bat 'mvnw.cmd test -Dtest="*Volunteer*Test"'
             }
         }
 
@@ -29,7 +29,7 @@ pipeline {
             steps {
                 echo 'Packaging the application into a standalone JAR file...'
                 // Packages the compiled code into a runnable .jar file
-                sh './mvnw package -DskipTests'
+                bat 'mvnw.cmd package -DskipTests'
             }
         }
     }
