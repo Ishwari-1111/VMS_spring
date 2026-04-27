@@ -13,6 +13,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Transactional
@@ -32,11 +34,45 @@ public class EventService {
         this.certificateRepository = certificateRepository;
     }
 
-    public Event createEvent(String eventId, String eventName, LocalDate date) {
-        if (eventRepo.existsById(eventId)) {
-            throw new IllegalArgumentException("Event already exists: " + eventId);
+    public Event createEvent(String eventName, LocalDate date, LocalDate finishDate) {
+        String resolvedEventId = generateNextEventId();
+
+        if (eventRepo.existsById(resolvedEventId)) {
+            throw new IllegalArgumentException("Event already exists: " + resolvedEventId);
         }
-        return eventRepo.save(new Event(eventId, eventName, date));
+
+        Event event = new Event(resolvedEventId, eventName, date);
+        event.setFinishDate(finishDate);
+        return eventRepo.save(event);
+    }
+
+    private String generateNextEventId() {
+        Pattern pattern = Pattern.compile("^([A-Za-z]*)(\\d+)$");
+        String prefix = "EV";
+        int maxValue = 0;
+
+        for (Event event : eventRepo.findAll()) {
+            String id = event.getEventId();
+            if (id == null) {
+                continue;
+            }
+
+            Matcher matcher = pattern.matcher(id.trim());
+            if (!matcher.matches()) {
+                continue;
+            }
+
+            String currentPrefix = matcher.group(1);
+            int currentValue = Integer.parseInt(matcher.group(2));
+            if (currentValue > maxValue) {
+                maxValue = currentValue;
+                if (!currentPrefix.isEmpty()) {
+                    prefix = currentPrefix;
+                }
+            }
+        }
+
+        return String.format("%s%03d", prefix, maxValue + 1);
     }
 
     public void deleteEvent(String eventId) {

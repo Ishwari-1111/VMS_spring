@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+
+    options {
+        timestamps()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat 'mvnw.cmd -B -DskipTests clean compile'
+            }
+        }
+
+        stage('Test-Certificate-Module') {
+            steps {
+                bat 'mvnw.cmd -B test -Dtest="*Certificate*Test"'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                bat 'mvnw.cmd -B -DskipTests package'
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: true
+            junit 'target/surefire-reports/*.xml'
+        }
+    }
+}
