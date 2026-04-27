@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checks out the source code from the repository linked to the Jenkins job
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Building the Spring Boot application...'
+                // Compiles the Java source code to ensure dependencies aren't broken
+                sh './mvnw clean compile'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Running Unit and Integration tests for Volunteer module...'
+                // Runs ONLY the tests related to the Volunteer module
+                sh './mvnw test -Dtest="*Volunteer*Test"'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                echo 'Packaging the application into a standalone JAR file...'
+                // Packages the compiled code into a runnable .jar file
+                sh './mvnw package -DskipTests'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Volunteer Module Pipeline completed successfully!'
+            // Archives the built JAR file so you can download it directly from Jenkins
+            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+        }
+        failure {
+            echo 'Volunteer Module Pipeline failed. Please check the Jenkins logs for errors.'
+        }
+        always {
+            echo 'Pipeline execution finished.'
+        }
+    }
+}
