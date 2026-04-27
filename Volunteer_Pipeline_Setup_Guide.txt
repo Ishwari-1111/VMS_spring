@@ -1,0 +1,40 @@
+HOW I SET UP AN INDIVIDUAL JENKINS PIPELINE FOR MY MODULE
+
+Step 1: Creating an Isolated Branch
+I started by creating a new Git branch specifically for my module's pipeline. This allows me to work on CI/CD without affecting the main code or other modules.
+Command: git checkout -b feature/volunteer-pipeline
+
+Step 2: Creating a Custom Jenkinsfile
+Instead of using the default 'Jenkinsfile', I created a new one called 'Jenkinsfile-Volunteer'. 
+Inside this file, I customized the 'Test' stage to only run the Volunteer tests using this command:
+mvnw test -Dtest="*Volunteer*Test"
+This is key because it proves the pipeline is dedicated to MY module.
+
+Step 3: Local Validation
+Before pushing, I ran the specific test command on my local machine to make sure it only executed the 23 volunteer-related tests and that they all passed.
+
+Step 4: Pushing to GitHub
+Once the code and Jenkinsfile were ready, I pushed the new branch to the remote repository so Jenkins could access it.
+Commands:
+git add .
+git commit -m "Created separate jenkins file for volunteer module"
+git push origin feature/volunteer-pipeline
+
+Step 5: Setting up the Jenkins Dashboard
+I went into my local Jenkins UI and created a new "Pipeline" project. 
+Instead of a standard setup, I configured it to:
+- Use "Pipeline script from SCM"
+- Point to my GitHub repository
+- SPECIFICALLY build the 'feature/volunteer-pipeline' branch
+- SPECIFICALLY look for 'Jenkinsfile-Volunteer' instead of the default filename.
+
+Step 6: Troubleshooting the Windows Environment
+My first build failed because I was using 'sh' commands in my Jenkinsfile. Since I'm running Jenkins on Windows, I had to change all 'sh' commands to 'bat' (Batch) commands and use 'mvnw.cmd'. 
+Once I committed and pushed this fix, the build worked!
+
+Step 7: Final Result
+Now, every time I push code to my branch, Jenkins automatically:
+1. Compiles the whole app.
+2. Runs only my module's tests.
+3. Produces a downloadable JAR file artifact.
+All this is visible in the Jenkins Stage View!
