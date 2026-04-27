@@ -40,10 +40,14 @@ eventService.deleteEvent(id);
 return ResponseEntity.noContent().build();
 }
 @PostMapping(value = "/{eventId}/volunteers/{volunteerId}", produces = "application/json")
-public ResponseEntity<Void> enroll(@PathVariable String eventId,
+public ResponseEntity<?> enroll(@PathVariable String eventId,
 @PathVariable String volunteerId) {
-eventService.enrollVolunteer(eventId, volunteerId);
-return ResponseEntity.ok().build();
+    try {
+        eventService.enrollVolunteer(eventId, volunteerId);
+        return ResponseEntity.ok(java.util.Map.of("success", true, "message", "Volunteer enrolled successfully"));
+    } catch (IllegalStateException e) {
+        return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "error", e.getMessage()));
+    }
 }
 @DeleteMapping("/{eventId}/volunteers/{volunteerId}")
 public ResponseEntity<Void> unenroll(@PathVariable String eventId,

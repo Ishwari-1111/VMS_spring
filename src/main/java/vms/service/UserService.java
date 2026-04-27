@@ -36,13 +36,8 @@ public class UserService {
             throw new IllegalArgumentException("Email already exists");
         }
         
-        // Validate and convert role (case-insensitive)
-        Role role;
-        try {
-            role = Role.valueOf(signupRequest.role().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid role. Must be ADMIN or VOLUNTEER");
-        }
+        // Enforce VOLUNTEER role for all new signups so random users cannot become admins
+        Role role = Role.VOLUNTEER;
         
         // Create new user
         User user = new User(
@@ -54,7 +49,7 @@ public class UserService {
         
         User savedUser = userRepository.save(user);
         
-        // If user is signing up as VOLUNTEER, automatically create Volunteer record
+        // Automatically create Volunteer record for new users
         if (role == Role.VOLUNTEER) {
             String volunteerId = "VOL_" + savedUser.getId() + "_" + savedUser.getUsername();
             Volunteer volunteer = new Volunteer(volunteerId, savedUser.getUsername());

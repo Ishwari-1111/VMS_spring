@@ -89,6 +89,19 @@ class EventControllerTest {
     }
 
     @Test
+    void testEnrollVolunteer_EventEnded_ReturnsBadRequest() throws Exception {
+        // Arrange: service throws IllegalStateException when event already ended
+        when(eventService.enrollVolunteer("E1", "V1")).thenThrow(new IllegalStateException("Event has already ended"));
+
+        mockMvc.perform(post("/api/events/E1/volunteers/V1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(java.util.Map.of(
+                        "success", false,
+                        "error", "Event has already ended"
+                ))));
+    }
+
+    @Test
     void testUnenrollVolunteer() throws Exception {
         mockMvc.perform(delete("/api/events/E1/volunteers/V1"))
                 .andExpect(status().isOk());

@@ -9,7 +9,6 @@ export default function Signup() {
     username: "",
     email: "",
     password: "",
-    role: "VOLUNTEER",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -25,7 +24,8 @@ export default function Signup() {
     e.preventDefault();
     setError(null);
 
-    const { username, email, password, role } = formData;
+    const { username, email, password } = formData;
+    const role = "VOLUNTEER";
 
     if (!username || !email || !password) {
       setError("Please fill in all fields");
@@ -133,25 +133,7 @@ export default function Signup() {
               </p>
             </div>
 
-            <div>
-              <label
-                htmlFor="role"
-                className="block text-sm font-medium text-neutral-700 mb-2"
-              >
-                Role
-              </label>
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="input-field"
-                disabled={loading}
-              >
-                <option value="VOLUNTEER">Volunteer</option>
-                <option value="ADMIN">Admin</option>
-              </select>
-            </div>
+            {/* Role is fixed to Volunteer for signups to prevent public admin registration */}
 
             <button
               type="submit"

@@ -129,4 +129,17 @@ class EventServiceTest {
         assertTrue(result);
         verify(eventRepository).save(mockEvent); // Ensure save is called
     }
+
+    @Test
+    void testEnrollVolunteer_EventAlreadyEnded_Throws() {
+        Event mockEvent = new Event("E200", "Past Event", LocalDate.of(2020, 1, 1));
+        mockEvent.setFinishDate(LocalDate.of(2020, 1, 2));
+
+        when(eventRepository.findById("E200")).thenReturn(Optional.of(mockEvent));
+
+        // Volunteer lookup should not be reached because event has already ended
+        assertThrows(IllegalStateException.class, () -> eventService.enrollVolunteer("E200", "V10"));
+
+        verify(eventRepository, never()).save(any());
+    }
 }

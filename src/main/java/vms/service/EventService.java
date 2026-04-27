@@ -93,6 +93,12 @@ public class EventService {
 
     public boolean enrollVolunteer(String eventId, String volunteerId) {
         Event event = getEvent(eventId);
+        // Prevent enrolling if event is completed or its finish date is in the past
+        LocalDate today = LocalDate.now();
+        if (Boolean.TRUE.equals(event.isCompleted()) ||
+            (event.getFinishDate() != null && event.getFinishDate().isBefore(today))) {
+            throw new IllegalStateException("Event has already ended");
+        }
         Volunteer volunteer = volunteerRepo.findById(volunteerId)
             .orElseThrow(() -> new NoSuchElementException("Volunteer not found: " + volunteerId));
         boolean added = event.addVolunteer(volunteer);
